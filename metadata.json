@@ -10,7 +10,7 @@
     "Input Shape": "Single",
     "Output": ["Other value"],
     "Output Type": ["Float"],
-    "Output Shape": "Flexible List",
+    "Output Shape": "Matrix",
     "Interpretation": "Embedding vectors of each smiles are obtained, represented in a matrix, where each row is a vector of embedding of each smiles character, with a dimension of 400. The pretrained model is loaded using the fastai library",
     "Tag": [
         "Descriptor",

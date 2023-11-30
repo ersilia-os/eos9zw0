@@ -69,7 +69,8 @@ def my_model(smiles_list):
     for smile in smiles_list:
         smile_tokenizer=tokenizer.tokenizer(smile)
         indices = [qsar_db.vocab.itos.index(token) for token in smile_tokenizer]
-        embes=embs_v1[indices][:, :100].numpy()
+        embes=embs_v1[indices][:, :].numpy()
+        embes = np.mean(embes, axis=0)
         list_embeddings.append(embes)
 
     return list_embeddings
@@ -91,8 +92,8 @@ assert input_len == output_len
 # write output in a .csv file
 with open(output_file, "w") as f:
     writer = csv.writer(f)
-    writer.writerow(["embeddings"])  # header
+    writer.writerow(["emb-{0}".format(i) for i in range(400)])  # header
     for o in outputs:
-        writer.writerow([o])
+        writer.writerow(list(o))
 
 
