@@ -3,21 +3,18 @@
     "Slug": "molpmofit",
     "Status": "Ready",
     "Title": "Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings",
-    "Description": "Using self-supervised learning, the authors pre-trained a large model using one millon unlabelled molecules from ChEMBL. This model can subsequently be fine-tuned for various QSAR tasks. Here, we provide the encodings for the molecular structures using the pre-trained model, not the fine-tuned QSAR models.\n",
+    "Description": "Using self-supervised learning, the authors pre-trained a large model using one millon unlabelled molecules from ChEMBL. This model can subsequently be fine-tuned for various QSAR tasks. Here, we provide the encodings for the molecular structures using the pre-trained model, not the fine-tuned QSAR models.",
+    "Deployment": [
+        "Local"
+    ],
     "Source": "Local",
     "Source Type": "External",
+    "Task": "Representation",
+    "Subtask": "Featurization",
     "Input": [
         "Compound"
     ],
     "Input Dimension": 1,
-    "Task": "Representation",
-    "Subtask": "Featurization",
-    "Biomedical Area": [
-        "Any"
-    ],
-    "Target Organism": [
-        "Not Applicable"
-    ],
     "Output": [
         "Value"
     ],
@@ -28,20 +25,23 @@
         "Descriptor",
         "Embedding"
     ],
-    "Publication": "https://jcheminf.biomedcentral.com/articles/10.1186/s13321-020-00430-x",
+    "Biomedical Area": [
+        "Any"
+    ],
+    "Target Organism": [
+        "Not Applicable"
+    ],
     "Publication Type": "Peer reviewed",
     "Publication Year": 2020,
+    "Publication": "https://jcheminf.biomedcentral.com/articles/10.1186/s13321-020-00430-x",
     "Source Code": "https://github.com/XinhaoLi74/MolPMoFiT",
     "License": "None",
     "Contributor": "GemmaTuron",
     "Incorporation Date": "2023-11-06",
+    "S3": "https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos9zw0.zip",
     "DockerHub": "https://hub.docker.com/r/ersiliaos/eos9zw0",
     "Docker Architecture": [
         "AMD64",
         "ARM64"
-    ],
-    "S3": "https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos9zw0.zip",
-    "Deployment": [
-        "Local"
     ]
 }
