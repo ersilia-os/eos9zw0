@@ -1,6 +1,7 @@
 # imports
 import pickle
 from rdkit import RDLogger 
+import pandas as pd
 RDLogger.DisableLog('rdApp.*') # switch off RDKit warning messages
 from fastai import *
 from fastai.text import *
@@ -28,7 +29,7 @@ with open(f'{path_vocab}', 'rb') as f:
 
 #Load the vocabulary
 vocab = Vocab(orig_itos)
-print(f'Vocab Size: {len(vocab.itos)}')
+
 #Initialize the Tokenizer
 tok = Tokenizer(partial(MolTokenizer, special_tokens = special_tokens), n_cpus=6, pre_rules=[], post_rules=[])
 
