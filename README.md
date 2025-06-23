@@ -50,7 +50,12 @@ _10 of 400 columns are shown_
 ### Resource Consumption
 - **Model Size (Mb):** `122`
 - **Environment Size (Mb):** `6523`
+- **Image Size (Mb):** `6594.2`
 
+**Computational Performance (seconds):**
+- 10 inputs: `41.35`
+- 100 inputs: `104.76`
+- 10000 inputs: `1599.82`
 
 ### References
 - **Source Code**: [https://github.com/XinhaoLi74/MolPMoFiT](https://github.com/XinhaoLi74/MolPMoFiT)
