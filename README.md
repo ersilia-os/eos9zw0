@@ -4,6 +4,7 @@ Using self-supervised learning, the authors pre-trained a large model using one 
 
 This model was incorporated on 2023-11-06.
 
+
 ## Information
 ### Identifiers
 - **Ersilia Identifier:** `eos9zw0`
@@ -13,7 +14,7 @@ This model was incorporated on 2023-11-06.
 - **Task:** `Representation`
 - **Subtask:** `Featurization`
 - **Biomedical Area:** `Any`
-- **Target Organism:** `Not Applicable`
+- **Target Organism:** `Any`
 - **Tags:** `Descriptor`, `Embedding`
 
 ### Input
