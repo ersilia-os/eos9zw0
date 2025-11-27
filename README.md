@@ -2,8 +2,7 @@
 
 Using self-supervised learning, the authors pre-trained a large model using one millon unlabelled molecules from ChEMBL. This model can subsequently be fine-tuned for various QSAR tasks. Here, we provide the encodings for the molecular structures using the pre-trained model, not the fine-tuned QSAR models.
 
-This model was incorporated on 2023-11-06.
-
+This model was incorporated on 2023-11-06.Last packaged on 2025-11-27.
 
 ## Information
 ### Identifiers
@@ -51,12 +50,12 @@ _10 of 400 columns are shown_
 ### Resource Consumption
 - **Model Size (Mb):** `122`
 - **Environment Size (Mb):** `8614`
-- **Image Size (Mb):** `6594.2`
+- **Image Size (Mb):** `8855.35`
 
 **Computational Performance (seconds):**
-- 10 inputs: `41.35`
-- 100 inputs: `104.76`
-- 10000 inputs: `1599.82`
+- 10 inputs: `32.67`
+- 100 inputs: `22.68`
+- 10000 inputs: `291.74`
 
 ### References
 - **Source Code**: [https://github.com/XinhaoLi74/MolPMoFiT](https://github.com/XinhaoLi74/MolPMoFiT)
