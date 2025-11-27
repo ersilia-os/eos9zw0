@@ -2,12 +2,15 @@
 import pickle
 from rdkit import RDLogger 
 import pandas as pd
+import numpy as np
+import csv
 RDLogger.DisableLog('rdApp.*') # switch off RDKit warning messages
 from fastai import *
 from fastai.text import *
 from utils import *
 from sklearn.model_selection import train_test_split
 from torch.nn import functional as F
+import torch
 
 import sys
 import os
@@ -31,7 +34,7 @@ with open(f'{path_vocab}', 'rb') as f:
 vocab = Vocab(orig_itos)
 
 #Initialize the Tokenizer
-tok = Tokenizer(partial(MolTokenizer, special_tokens = special_tokens), n_cpus=6, pre_rules=[], post_rules=[])
+tok = Tokenizer(partial(MolTokenizer, special_tokens = special_tokens), n_cpus=1, pre_rules=[], post_rules=[])
 
 #read the dataset for  QSAR tasks. 
 #Load the data y data augmentation
@@ -45,11 +48,76 @@ train, val = train_test_split(train,
 
 bs = 128 #batch size
 
-#Create the specific group of data for the language model, the same data used for train the model.
-#Build the fastai databunch
-qsar_db = TextClasDataBunch.from_df(path_to_checkpoint, train, val, bs=bs, tokenizer=tok, 
-                                    chunksize=50000, text_cols='smiles',label_cols='p_np', 
-                                    vocab=vocab, max_vocab=60000, include_bos=False)
+# Debug prints
+print(f"Train shape: {train.shape}")
+print(f"Val shape: {val.shape}")
+print(f"Columns: {train.columns.tolist()}")
+print(f"Sample SMILES: {train['smiles'].iloc[0]}")
+print(f"Sample label: {train['p_np'].iloc[0]}")
+
+# Manually tokenize the data first
+print("Tokenizing data...")
+tokenizer_func = MolTokenizer(special_tokens=special_tokens)
+
+def tokenize_smiles(smiles):
+    return tokenizer_func.tokenizer(smiles)
+
+def numericalize_tokens(tokens, vocab):
+    return [vocab.stoi.get(token, vocab.stoi.get('xxunk', 0)) for token in tokens]
+
+# Tokenize and numericalize training data
+train_tokens = [tokenize_smiles(s) for s in train['smiles'].values]
+train_numerics = [numericalize_tokens(t, vocab) for t in train_tokens]
+train_labels = train['p_np'].values
+
+# Tokenize and numericalize validation data
+val_tokens = [tokenize_smiles(s) for s in val['smiles'].values]
+val_numerics = [numericalize_tokens(t, vocab) for t in val_tokens]
+val_labels = val['p_np'].values
+
+# Pad sequences to the same length
+def pad_sequences(sequences, pad_value=1, max_len=None):
+    if max_len is None:
+        max_len = max(len(s) for s in sequences)
+    padded = []
+    for seq in sequences:
+        if len(seq) < max_len:
+            padded.append(seq + [pad_value] * (max_len - len(seq)))
+        else:
+            padded.append(seq[:max_len])
+    return padded
+
+print("Padding sequences...")
+train_padded = pad_sequences(train_numerics)
+val_padded = pad_sequences(val_numerics, max_len=len(train_padded[0]))
+
+# Convert to tensors
+train_x = torch.tensor(train_padded, dtype=torch.long)
+train_y = torch.tensor(train_labels, dtype=torch.long)
+val_x = torch.tensor(val_padded, dtype=torch.long)
+val_y = torch.tensor(val_labels, dtype=torch.long)
+
+# Create custom dataset class with required attributes
+class TextDataset(torch.utils.data.TensorDataset):
+    def __init__(self, x, y, c):
+        super().__init__(x, y)
+        self.c = c  # number of classes
+
+# Get number of classes
+num_classes = len(np.unique(train_labels))
+
+# Create datasets with c attribute
+train_ds = TextDataset(train_x, train_y, num_classes)
+val_ds = TextDataset(val_x, val_y, num_classes)
+
+# Create DataLoaders
+train_dl = DataLoader(train_ds, batch_size=bs, shuffle=True)
+val_dl = DataLoader(val_ds, batch_size=bs, shuffle=False)
+
+# Create databunch manually
+qsar_db = DataBunch(train_dl, val_dl, path=path_to_checkpoint)
+qsar_db.vocab = vocab
+qsar_db.c = num_classes
 
 #create the classification/regression learner.
 cls_learner = text_classifier_learner(qsar_db, AWD_LSTM, pretrained=False, drop_mult=0.1)
@@ -59,18 +127,22 @@ cls_learner = text_classifier_learner(qsar_db, AWD_LSTM, pretrained=False, drop_
 cls_learner.load_encoder('ChemBL_atom_encoder')
 
 def get_normalized_embeddings():
-  return F.normalize(cls_learner.model[0].module.encoder.weight)
+    return F.normalize(cls_learner.model[0].module.encoder.weight)
 
 embs_v1 = get_normalized_embeddings()
 
 # my model
 def my_model(smiles_list):
     list_embeddings=[]
-    tokenizer = MolTokenizer()
+    tokenizer = MolTokenizer(special_tokens=special_tokens)
     for smile in smiles_list:
         smile_tokenizer=tokenizer.tokenizer(smile)
-        indices = [qsar_db.vocab.itos.index(token) for token in smile_tokenizer]
-        embes=embs_v1[indices][:, :].numpy()
+        indices = [vocab.stoi.get(token, vocab.stoi.get('xxunk', 0)) for token in smile_tokenizer]
+        if len(indices) == 0:
+            # Handle empty tokenization - use zero vector
+            list_embeddings.append(np.zeros(400))
+            continue
+        embes=embs_v1[indices][:, :].detach().cpu().numpy()
         embes = np.mean(embes, axis=0)
         list_embeddings.append(embes)
 
@@ -96,5 +168,3 @@ with open(output_file, "w") as f:
     writer.writerow(["dim_{0}".format(str(i).zfill(3)) for i in range(400)])  # header
     for o in outputs:
         writer.writerow(list(o))
-
-
