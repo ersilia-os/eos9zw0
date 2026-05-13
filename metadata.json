@@ -1,7 +1,7 @@
 {
     "Identifier": "eos9zw0",
     "Slug": "molpmofit",
-    "Status": "In maintenance",
+    "Status": "Ready",
     "Title": "Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings",
     "Description": "Using self-supervised learning, the authors pre-trained a large model using one millon unlabelled molecules from ChEMBL. This model can subsequently be fine-tuned for various QSAR tasks. Here, we provide the encodings for the molecular structures using the pre-trained model, not the fine-tuned QSAR models.",
     "Deployment": [
@@ -38,7 +38,7 @@
     "License": "None",
     "Contributor": "GemmaTuron",
     "Incorporation Date": "2023-11-06",
-    "Last Packaging Date": "2025-11-27",
+    "Last Packaging Date": "2026-05-13",
     "Release": "v1.0.0",
     "S3": "https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos9zw0.zip",
     "DockerHub": "https://hub.docker.com/r/ersiliaos/eos9zw0",
@@ -48,10 +48,10 @@
     ],
     "Model Size": 122.0,
     "Environment Size": 6575.0,
-    "Image Size": 8855.35,
-    "Computational Performance 1": 32.67,
-    "Computational Performance 2": 22.65,
-    "Computational Performance 3": 22.68,
-    "Computational Performance 4": 72.28,
-    "Computational Performance 5": 291.74
+    "Image Size": 6813.52,
+    "Computational Performance 1": 39.48,
+    "Computational Performance 2": 31.4,
+    "Computational Performance 3": 30.01,
+    "Computational Performance 4": 80.39,
+    "Computational Performance 5": 277.74
 }
