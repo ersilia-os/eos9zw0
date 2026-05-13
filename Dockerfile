@@ -1,8 +1,8 @@
 FROM bentoml/model-server:0.11.0-py310
 MAINTAINER ersilia
 
-RUN conda install -c conda-forge compilers==1.9.0
-RUN conda install -c conda-forge libxcrypt==4.4.36
+RUN conda install -y -c conda-forge compilers==1.9.0
+RUN conda install -y -c conda-forge libxcrypt==4.4.36
 
 # Install packages in order, with numpy constraints
 RUN pip install rdkit==2024.3.5
