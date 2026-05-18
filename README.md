@@ -59,7 +59,7 @@ _10 of 400 columns are shown_
 
 ### References
 - **Source Code**: [https://github.com/XinhaoLi74/MolPMoFiT](https://github.com/XinhaoLi74/MolPMoFiT)
-- **Publication**: [https://jcheminf.biomedcentral.com/articles/10.1186/s13321-020-00430-x](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-020-00430-x)
+- **Publication**: [https://doi.org/10.1186/s13321-020-00430-x](https://doi.org/10.1186/s13321-020-00430-x)
 - **Publication Type:** `Peer reviewed`
 - **Publication Year:** `2020`
 - **Ersilia Contributor:** [GemmaTuron](https://github.com/GemmaTuron)
