@@ -28,16 +28,16 @@ This model was incorporated on 2023-11-06.Last packaged on 2026-05-13.
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
 |------|------|-----------|-------------|
-| dim_000 | float |  | MolPMoFit encoding dimension index 0 |
-| dim_001 | float |  | MolPMoFit encoding dimension index 1 |
-| dim_002 | float |  | MolPMoFit encoding dimension index 2 |
-| dim_003 | float |  | MolPMoFit encoding dimension index 3 |
-| dim_004 | float |  | MolPMoFit encoding dimension index 4 |
-| dim_005 | float |  | MolPMoFit encoding dimension index 5 |
-| dim_006 | float |  | MolPMoFit encoding dimension index 6 |
-| dim_007 | float |  | MolPMoFit encoding dimension index 7 |
-| dim_008 | float |  | MolPMoFit encoding dimension index 8 |
-| dim_009 | float |  | MolPMoFit encoding dimension index 9 |
+| feat_000 | float |  | MolPMoFit encoding dimension index 0 |
+| feat_001 | float |  | MolPMoFit encoding dimension index 1 |
+| feat_002 | float |  | MolPMoFit encoding dimension index 2 |
+| feat_003 | float |  | MolPMoFit encoding dimension index 3 |
+| feat_004 | float |  | MolPMoFit encoding dimension index 4 |
+| feat_005 | float |  | MolPMoFit encoding dimension index 5 |
+| feat_006 | float |  | MolPMoFit encoding dimension index 6 |
+| feat_007 | float |  | MolPMoFit encoding dimension index 7 |
+| feat_008 | float |  | MolPMoFit encoding dimension index 8 |
+| feat_009 | float |  | MolPMoFit encoding dimension index 9 |
 
 _10 of 400 columns are shown_
 ### Source and Deployment
