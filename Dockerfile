@@ -12,6 +12,7 @@ RUN pip install fastai==1.0.61
 
 # Force numpy to compatible version AFTER all other packages
 RUN pip install numpy==1.23.5 
+RUN pip install setuptools==80.9.0
 
 WORKDIR /repo
 COPY . /repo
