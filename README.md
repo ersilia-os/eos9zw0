@@ -1,6 +1,6 @@
 # Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings
 
-Using self-supervised learning, the authors pre-trained a large model using one millon unlabelled molecules from ChEMBL. This model can subsequently be fine-tuned for various QSAR tasks. Here, we provide the encodings for the molecular structures using the pre-trained model, not the fine-tuned QSAR models.
+Represents a molecule as 400 features taken from MolPMoFiT, a language model pretrained on ChEMBL structures and adapted from the inductive transfer learning approach developed for natural language. Li and Fourches showed that pretraining a general chemical language model and then fine-tuning it for specific endpoints outperforms training from scratch when labelled activity data are limited. The embedding is extracted from the pretrained encoder and is not individually interpretable.
 
 This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 
@@ -23,7 +23,7 @@ This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 ### Output
 - **Output Dimension:** `400`
 - **Output Consistency:** `Fixed`
-- **Interpretation:** Embedding vectors of each smiles are obtained, represented in a matrix, where each row is a vector of embedding of each smiles character, with a dimension of 400. The pretrained model is loaded using the fastai library
+- **Interpretation:** 400 features encoding molecular structure from a pretrained chemical language model.
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
