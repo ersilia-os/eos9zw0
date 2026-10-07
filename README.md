@@ -1,6 +1,6 @@
 # Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings
 
-Represents a molecule as 400 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained model is served here, not any fine-tuned endpoint, and the vector is the mean of the normalised token embedding weights of the SMILES symbols, so it records composition rather than sequence context.
+Represents a molecule as 1,200 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained encoder is served, not any fine-tuned endpoint; its last LSTM layer is summarised by ULMFiT concat pooling (last hidden state, max-pool and mean-pool, 400 features each), the input its prediction heads use.
 
 This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 
@@ -21,25 +21,25 @@ This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 - **Input Dimension:** `1`
 
 ### Output
-- **Output Dimension:** `400`
+- **Output Dimension:** `1200`
 - **Output Consistency:** `Fixed`
-- **Interpretation:** Mean of the 400-dimensional token embeddings a ChEMBL-pretrained language model assigns to each SMILES symbol.
+- **Interpretation:** Last hidden state, max-pool and mean-pool of the final LSTM layer of a ChEMBL-pretrained SMILES language model, 400 features each.
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
 |------|------|-----------|-------------|
-| feat_000 | float |  | MolPMoFit encoding dimension index 0 |
-| feat_001 | float |  | MolPMoFit encoding dimension index 1 |
-| feat_002 | float |  | MolPMoFit encoding dimension index 2 |
-| feat_003 | float |  | MolPMoFit encoding dimension index 3 |
-| feat_004 | float |  | MolPMoFit encoding dimension index 4 |
-| feat_005 | float |  | MolPMoFit encoding dimension index 5 |
-| feat_006 | float |  | MolPMoFit encoding dimension index 6 |
-| feat_007 | float |  | MolPMoFit encoding dimension index 7 |
-| feat_008 | float |  | MolPMoFit encoding dimension index 8 |
-| feat_009 | float |  | MolPMoFit encoding dimension index 9 |
+| feat_0000 | float |  | MolPMoFiT last hidden state (dimension 0) |
+| feat_0001 | float |  | MolPMoFiT last hidden state (dimension 1) |
+| feat_0002 | float |  | MolPMoFiT last hidden state (dimension 2) |
+| feat_0003 | float |  | MolPMoFiT last hidden state (dimension 3) |
+| feat_0004 | float |  | MolPMoFiT last hidden state (dimension 4) |
+| feat_0005 | float |  | MolPMoFiT last hidden state (dimension 5) |
+| feat_0006 | float |  | MolPMoFiT last hidden state (dimension 6) |
+| feat_0007 | float |  | MolPMoFiT last hidden state (dimension 7) |
+| feat_0008 | float |  | MolPMoFiT last hidden state (dimension 8) |
+| feat_0009 | float |  | MolPMoFiT last hidden state (dimension 9) |
 
-_10 of 400 columns are shown_
+_10 of 1200 columns are shown_
 ### Source and Deployment
 - **Source:** `Local`
 - **Source Type:** `External`
