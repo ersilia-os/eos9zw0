@@ -3,7 +3,7 @@
     "Slug": "molpmofit",
     "Status": "Ready",
     "Title": "Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings",
-    "Description": "Represents a molecule as 400 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained model is served here, not any fine-tuned endpoint, and the vector is the mean of the normalised token embedding weights of the SMILES symbols, so it records composition rather than sequence context.",
+    "Description": "Represents a molecule as 1,200 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained encoder is served, not any fine-tuned endpoint; its last LSTM layer is summarised by ULMFiT concat pooling (last hidden state, max-pool and mean-pool, 400 features each), the input its prediction heads use.",
     "Deployment": [
         "Local"
     ],
@@ -18,9 +18,9 @@
     "Output": [
         "Value"
     ],
-    "Output Dimension": 400,
+    "Output Dimension": 1200,
     "Output Consistency": "Fixed",
-    "Interpretation": "Mean of the 400-dimensional token embeddings a ChEMBL-pretrained language model assigns to each SMILES symbol.",
+    "Interpretation": "Last hidden state, max-pool and mean-pool of the final LSTM layer of a ChEMBL-pretrained SMILES language model, 400 features each.",
     "Tag": [
         "Descriptor",
         "Embedding"

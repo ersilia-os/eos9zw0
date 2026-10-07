@@ -1,15 +1,11 @@
 # imports
 import pickle
-from rdkit import RDLogger 
-import pandas as pd
-import numpy as np
+from collections import defaultdict
+from rdkit import Chem, RDLogger
 import csv
 RDLogger.DisableLog('rdApp.*') # switch off RDKit warning messages
-from fastai import *
-from fastai.text import *
-from utils import *
-from sklearn.model_selection import train_test_split
-from torch.nn import functional as F
+from fastai.text.models.awd_lstm import AWD_LSTM
+from utils import MolTokenizer, special_tokens
 import torch
 
 import sys
@@ -21,132 +17,55 @@ output_file = sys.argv[2]
 
 # current file directory
 root = os.path.dirname(os.path.abspath(__file__))
-path= os.path.abspath(os.path.join(root,".."))
-path_to_checkpoint=os.path.abspath(os.path.join(root,"..", "..", "checkpoints"))
-path_vocab= os.path.abspath(os.path.join(root,"..","..","checkpoints", "ChemBL_atom_vocab.pkl"))
-path_bbp= os.path.abspath(os.path.join(root,"..","data","QSAR","bbbp.csv"))
+path_to_checkpoint = os.path.abspath(os.path.join(root, "..", "..", "checkpoints"))
+path_vocab = os.path.join(path_to_checkpoint, "ChemBL_atom_vocab.pkl")
+path_encoder = os.path.join(path_to_checkpoint, "models", "ChemBL_atom_encoder.pth")
 
-#Read the vocabulary
-with open(f'{path_vocab}', 'rb') as f:
-    orig_itos = pickle.load(f)
+EMB_SZ = 400 # size of the final LSTM layer output
+BATCH_SIZE = 128
 
-#Load the vocabulary
-vocab = Vocab(orig_itos)
+#Read the vocabulary; tokens missing from it map to index 0, as in fastai's numericalisation
+with open(path_vocab, 'rb') as f:
+    itos = pickle.load(f)
+stoi = {}
+for i, token in enumerate(itos):
+    stoi.setdefault(token, i)
 
-#Initialize the Tokenizer
-tok = Tokenizer(partial(MolTokenizer, special_tokens = special_tokens), n_cpus=1, pre_rules=[], post_rules=[])
+tokenizer = MolTokenizer(special_tokens=special_tokens)
 
-#read the dataset for  QSAR tasks. 
-#Load the data y data augmentation
-bbbp = pd.read_csv(path_bbp)
+#Load the pretrained MolPMoFiT encoder (AWD-LSTM, 3 layers)
+encoder = AWD_LSTM(vocab_sz=len(itos), emb_sz=EMB_SZ, n_hid=1152, n_layers=3, pad_token=1)
+encoder.load_state_dict(torch.load(path_encoder, map_location="cpu"))
+encoder.eval()
 
-train, test = train_test_split(bbbp,
-    test_size=0.1, shuffle = True, random_state = 8)
-
-train, val = train_test_split(train,
-    test_size=0.1, shuffle = True, random_state = 42)
-
-bs = 128 #batch size
-
-# Debug prints
-print(f"Train shape: {train.shape}")
-print(f"Val shape: {val.shape}")
-print(f"Columns: {train.columns.tolist()}")
-print(f"Sample SMILES: {train['smiles'].iloc[0]}")
-print(f"Sample label: {train['p_np'].iloc[0]}")
-
-# Manually tokenize the data first
-print("Tokenizing data...")
-tokenizer_func = MolTokenizer(special_tokens=special_tokens)
-
-def tokenize_smiles(smiles):
-    return tokenizer_func.tokenizer(smiles)
-
-def numericalize_tokens(tokens, vocab):
-    return [vocab.stoi.get(token, vocab.stoi.get('xxunk', 0)) for token in tokens]
-
-# Tokenize and numericalize training data
-train_tokens = [tokenize_smiles(s) for s in train['smiles'].values]
-train_numerics = [numericalize_tokens(t, vocab) for t in train_tokens]
-train_labels = train['p_np'].values
-
-# Tokenize and numericalize validation data
-val_tokens = [tokenize_smiles(s) for s in val['smiles'].values]
-val_numerics = [numericalize_tokens(t, vocab) for t in val_tokens]
-val_labels = val['p_np'].values
-
-# Pad sequences to the same length
-def pad_sequences(sequences, pad_value=1, max_len=None):
-    if max_len is None:
-        max_len = max(len(s) for s in sequences)
-    padded = []
-    for seq in sequences:
-        if len(seq) < max_len:
-            padded.append(seq + [pad_value] * (max_len - len(seq)))
-        else:
-            padded.append(seq[:max_len])
-    return padded
-
-print("Padding sequences...")
-train_padded = pad_sequences(train_numerics)
-val_padded = pad_sequences(val_numerics, max_len=len(train_padded[0]))
-
-# Convert to tensors
-train_x = torch.tensor(train_padded, dtype=torch.long)
-train_y = torch.tensor(train_labels, dtype=torch.long)
-val_x = torch.tensor(val_padded, dtype=torch.long)
-val_y = torch.tensor(val_labels, dtype=torch.long)
-
-# Create custom dataset class with required attributes
-class TextDataset(torch.utils.data.TensorDataset):
-    def __init__(self, x, y, c):
-        super().__init__(x, y)
-        self.c = c  # number of classes
-
-# Get number of classes
-num_classes = len(np.unique(train_labels))
-
-# Create datasets with c attribute
-train_ds = TextDataset(train_x, train_y, num_classes)
-val_ds = TextDataset(val_x, val_y, num_classes)
-
-# Create DataLoaders
-train_dl = DataLoader(train_ds, batch_size=bs, shuffle=True)
-val_dl = DataLoader(val_ds, batch_size=bs, shuffle=False)
-
-# Create databunch manually
-qsar_db = DataBunch(train_dl, val_dl, path=path_to_checkpoint)
-qsar_db.vocab = vocab
-qsar_db.c = num_classes
-
-#create the classification/regression learner.
-cls_learner = text_classifier_learner(qsar_db, AWD_LSTM, pretrained=False, drop_mult=0.1)
-
-#The encoder of the model is loaded before training, and then access the first layer, the embeddings layer, and obtain them
-#learner.load_encoder() will load the model from path/models/
-cls_learner.load_encoder('ChemBL_atom_encoder')
-
-def get_normalized_embeddings():
-    return F.normalize(cls_learner.model[0].module.encoder.weight)
-
-embs_v1 = get_normalized_embeddings()
+def tokens_to_ids(smiles):
+    return [stoi.get(token, 0) for token in tokenizer.tokenizer(smiles)]
 
 # my model
+@torch.no_grad()
 def my_model(smiles_list):
-    list_embeddings=[]
-    tokenizer = MolTokenizer(special_tokens=special_tokens)
-    for smile in smiles_list:
-        smile_tokenizer=tokenizer.tokenizer(smile)
-        indices = [vocab.stoi.get(token, vocab.stoi.get('xxunk', 0)) for token in smile_tokenizer]
-        if len(indices) == 0:
-            # Handle empty tokenization - use zero vector
-            list_embeddings.append(np.zeros(400))
-            continue
-        embes=embs_v1[indices][:, :].detach().cpu().numpy()
-        embes = np.mean(embes, axis=0)
-        list_embeddings.append(embes)
+    """ULMFiT concat pooling of the final LSTM layer: [last hidden state, max-pool, mean-pool], 1200 features.
 
-    return list_embeddings
+    Molecules are batched by token length so that no padding is needed: each molecule gets the same
+    vector it would get on its own. Molecules RDKit cannot parse are returned as None.
+    """
+    outputs = [None] * len(smiles_list)
+    by_length = defaultdict(list)
+    for i, smiles in enumerate(smiles_list):
+        if Chem.MolFromSmiles(smiles) is None:
+            continue
+        by_length[len(tokens_to_ids(smiles))].append(i)
+    for indices in by_length.values():
+        for start in range(0, len(indices), BATCH_SIZE):
+            batch = indices[start:start + BATCH_SIZE]
+            x = torch.tensor([tokens_to_ids(smiles_list[i]) for i in batch], dtype=torch.long)
+            encoder.reset() # the encoder keeps its hidden state between calls
+            _, layer_outputs = encoder(x)
+            last_layer = layer_outputs[-1]
+            pooled = torch.cat([last_layer[:, -1], last_layer.max(dim=1)[0], last_layer.mean(dim=1)], dim=1)
+            for j, i in enumerate(batch):
+                outputs[i] = list(pooled[j].numpy()) # float32 values, written in their shortest form
+    return outputs
 
 # read SMILES from .csv file, assuming one column with header
 with open(input_file, "r") as f:
@@ -162,9 +81,10 @@ input_len = len(smiles_list)
 output_len = len(outputs)
 assert input_len == output_len
 
-# write output in a .csv file
+# write output in a .csv file; molecules that could not be processed are written as empty cells
+n_features = 3 * EMB_SZ
 with open(output_file, "w") as f:
     writer = csv.writer(f)
-    writer.writerow(["feat_{0}".format(str(i).zfill(3)) for i in range(400)])  # header
+    writer.writerow(["feat_{0}".format(str(i).zfill(4)) for i in range(n_features)])  # header
     for o in outputs:
-        writer.writerow(list(o))
+        writer.writerow(o if o is not None else [None] * n_features)
