@@ -1,6 +1,6 @@
 # Molecular Prediction Model Fine-Tuning (MolPMoFiT) encodings
 
-Represents a molecule as 400 features taken from MolPMoFiT, a language model pretrained on ChEMBL structures and adapted from the inductive transfer learning approach developed for natural language. Li and Fourches showed that pretraining a general chemical language model and then fine-tuning it for specific endpoints outperforms training from scratch when labelled activity data are limited. The embedding is extracted from the pretrained encoder and is not individually interpretable.
+Represents a molecule as 400 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained model is served here, not any fine-tuned endpoint, and the vector is the mean of the normalised token embedding weights of the SMILES symbols, so it records composition rather than sequence context.
 
 This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 
@@ -23,7 +23,7 @@ This model was incorporated on 2023-11-06.Last packaged on 2026-08-31.
 ### Output
 - **Output Dimension:** `400`
 - **Output Consistency:** `Fixed`
-- **Interpretation:** 400 features encoding molecular structure from a pretrained chemical language model.
+- **Interpretation:** Mean of the 400-dimensional token embeddings a ChEMBL-pretrained language model assigns to each SMILES symbol.
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
