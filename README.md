@@ -2,7 +2,7 @@
 
 Represents a molecule as 1,200 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained encoder is served, not any fine-tuned endpoint; its last LSTM layer is summarised by ULMFiT concat pooling (last hidden state, max-pool and mean-pool, 400 features each), the input its prediction heads use.
 
-This model was incorporated on 2023-11-06.Last packaged on 2026-10-07.
+This model was incorporated on 2023-11-06.Last packaged on 2026-10-15.
 
 ## Information
 ### Identifiers
@@ -50,12 +50,12 @@ _10 of 1200 columns are shown_
 ### Resource Consumption
 - **Model Size (Mb):** `122`
 - **Environment Size (Mb):** `7263`
-- **Image Size (Mb):** `7501.1`
+- **Image Size (Mb):** `7501.23`
 
 **Computational Performance (seconds):**
-- 10 inputs: `29.68`
-- 100 inputs: `23.32`
-- 10000 inputs: `296.57`
+- 10 inputs: `31.75`
+- 100 inputs: `24.43`
+- 10000 inputs: `381.08`
 
 ### References
 - **Source Code**: [https://github.com/XinhaoLi74/MolPMoFiT](https://github.com/XinhaoLi74/MolPMoFiT)
