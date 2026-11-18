@@ -2,7 +2,8 @@
 
 Represents a molecule as 1,200 features drawn from MolPMoFiT, an AWD-LSTM language model that Li and Fourches pretrained on one million unlabelled ChEMBL structures by adapting the ULMFiT inductive transfer learning recipe from natural language, then fine-tuned for lipophilicity, solvation, HIV activity and blood-brain barrier penetration. Only the pretrained encoder is served, not any fine-tuned endpoint; its last LSTM layer is summarised by ULMFiT concat pooling (last hidden state, max-pool and mean-pool, 400 features each), the input its prediction heads use.
 
-This model was incorporated on 2023-11-06.Last packaged on 2026-10-15.
+This model was incorporated on 2023-11-06.
+Last packaged on 2026-10-15.
 
 ## Information
 ### Identifiers
@@ -46,6 +47,7 @@ _10 of 1200 columns are shown_
 - **DockerHub**: [https://hub.docker.com/r/ersiliaos/eos9zw0](https://hub.docker.com/r/ersiliaos/eos9zw0)
 - **Docker Architecture:** `AMD64`, `ARM64`
 - **S3 Storage**: [https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos9zw0.zip](https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos9zw0.zip)
+- **Apptainer**: [https://models-sif.s3.eu-north-1.amazonaws.com/eos9zw0_v3.sif](https://models-sif.s3.eu-north-1.amazonaws.com/eos9zw0_v3.sif)
 
 ### Resource Consumption
 - **Model Size (Mb):** `122`
